@@ -5,10 +5,12 @@
 \title{Visualize network
 .}
 \usage{
-visualize_network(network)
+visualize_network(network, layout = "layout_nicely")
 }
 \arguments{
 \item{network}{igraph object}
+
+\item{layout}{igraph layout algorithm default: "layout_nicely"}
 }
 \value{
 visualization

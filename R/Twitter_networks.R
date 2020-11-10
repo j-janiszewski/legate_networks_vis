@@ -145,11 +145,12 @@ create_community_table<-function(network,communities){
 #'
 #' This function will visualize given network using visnetwork package
 #' @param network igraph object
+#' @param layout igraph layout algorithm default: "layout_nicely"
 #' @return visualization
 #' @export
-visualize_network<-function(network){
+visualize_network<-function(network,layout="layout_nicely"){
 
-  visNetwork::visIgraph(network,layout = 'layout_with_lgl',randomSeed = 155)->network
+  visNetwork::visIgraph(network,layout = layout,randomSeed = 155)->network
   visNetwork::visEdges( network,font ='30px arial black' ,smooth = FALSE,color = list(color = "#6D6E71", highlight = "red")) ->network
   visNetwork::visNodes(network,font = '20px arial black') -> network
   visNetwork::visOptions(network,highlightNearest = list(enabled = TRUE))->network
