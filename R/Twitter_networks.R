@@ -53,8 +53,7 @@ create_network <- function(partia, poslowie, tweets, whole_parliament = F, inclu
     names(x)[names(x) == "retweet_screen_name"] <- "to"
   }
   else {
-
-    x<-tibble::tibble(screen_name=vector(mode = "character"),to=vector(mode="character"))
+    x <- tibble::tibble(screen_name = vector(mode = "character"), to = vector(mode = "character"))
   }
   if (include_replies) {
     y <- filter_tweets_replies(tweets, twitters)
@@ -68,7 +67,12 @@ create_network <- function(partia, poslowie, tweets, whole_parliament = F, inclu
   }
   vertices <- union(x$screen_name, x$to)
   dplyr::inner_join(tibble::tibble(screen_name = vertices), poslowie, by = "screen_name") -> vertices
-  names(vertices)[names(vertices) == "subparty"] <- "group"
+  if (!whole_parliament) {
+    names(vertices)[names(vertices) == "subparty"] <- "group"
+  }
+  else {
+    names(vertices)[names(vertices) == "party"] <- "group"
+  }
   rt_g <- igraph::graph_from_data_frame(x, vertices = vertices, directed = TRUE)
   igraph::E(rt_g)$weight <- 1
   return(rt_g)
@@ -127,16 +131,15 @@ summary_interactions_among_clusters <- function(network, communities) {
 #' @param communities communities of network
 #' @return Data frame with summary
 #' @export
-create_community_table<-function(network,communities){
-
-  igraph::membership(communities ) -> x
+create_community_table <- function(network, communities) {
+  igraph::membership(communities) -> x
   data.frame(keyName = names(x), value = as.numeric(x), row.names = NULL) -> communities
-  igraph::as_data_frame(network,what="vertices")->vertices
-  dplyr::inner_join(vertices,communities,by=c("name" = "keyName"))->x
-  dplyr::select(x,name,value,group)->x
-  names(x)[names(x)=='group']<-'Partia'
-  names(x)[names(x)=='value']<-'Cluster'
-  names(x)[names(x)=='name']<-'Imie i Nazwisko'
+  igraph::as_data_frame(network, what = "vertices") -> vertices
+  dplyr::inner_join(vertices, communities, by = c("name" = "keyName")) -> x
+  dplyr::select(x, name, value, group) -> x
+  names(x)[names(x) == "group"] <- "Partia"
+  names(x)[names(x) == "value"] <- "Cluster"
+  names(x)[names(x) == "name"] <- "Imie i Nazwisko"
 
   return(x)
 }
@@ -146,15 +149,16 @@ create_community_table<-function(network,communities){
 #' This function will visualize given network using visnetwork package
 #' @param network igraph object
 #' @param layout igraph layout algorithm default: "layout_nicely"
+#' @param  show_legend logical indicator if function will show legend for graph verticies colors
 #' @return visualization
 #' @export
-visualize_network<-function(network,layout="layout_nicely"){
-
-  visNetwork::visIgraph(network,layout = layout,randomSeed = 155)->network
-  visNetwork::visEdges( network,font ='30px arial black' ,smooth = FALSE,color = list(color = "#6D6E71", highlight = "red")) ->network
-  visNetwork::visNodes(network,font = '20px arial black') -> network
-  visNetwork::visOptions(network,highlightNearest = list(enabled = TRUE))->network
-  visNetwork::visLegend(network,position = 'right',width = 0.3,zoom=FALSE) ->network
+visualize_network <- function(network, layout = "layout_nicely", show_legend = T) {
+  visNetwork::visIgraph(network, layout = layout, randomSeed = 155) -> network
+  visNetwork::visEdges(network, font = "30px arial black", smooth = FALSE, color = list(color = "#6D6E71", highlight = "red")) -> network
+  visNetwork::visNodes(network, font = "20px arial black") -> network
+  visNetwork::visOptions(network, highlightNearest = list(enabled = TRUE)) -> network
+  if (show_legend) {
+    visNetwork::visLegend(network, position = "right", width = 0.3, zoom = FALSE) -> network
+  }
   return(network)
-
 }

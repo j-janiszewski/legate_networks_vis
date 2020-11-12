@@ -5,12 +5,14 @@
 \title{Visualize network
 .}
 \usage{
-visualize_network(network, layout = "layout_nicely")
+visualize_network(network, layout = "layout_nicely", show_legend = T)
 }
 \arguments{
 \item{network}{igraph object}
 
 \item{layout}{igraph layout algorithm default: "layout_nicely"}
+
+\item{show_legend}{logical indicator if function will show legend for graph verticies colors}
 }
 \value{
 visualization
